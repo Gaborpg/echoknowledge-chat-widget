@@ -30,8 +30,16 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
-            ]
+              "src/styles.scss",
+              "node_modules/@ctrl/ngx-emoji-mart/picker.css"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "./src/styles/mixings",
+                "./src/styles/variables",
+                "./src/styles/components"
+              ]
+            }
           },
           "configurations": {
             "production": {
@@ -88,8 +96,16 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
-            ]
+              "src/styles.scss",
+              "node_modules/@ctrl/ngx-emoji-mart/picker.css"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "./src/styles/mixings",
+                "./src/styles/variables",
+                "./src/styles/components"
+              ]
+            }
           }
         },
         "lint": {

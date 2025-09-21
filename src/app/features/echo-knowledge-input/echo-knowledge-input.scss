@@ -1,0 +1,60 @@
+﻿:host {
+  width: 100%;
+}
+
+.chat-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: 0.5rem;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.chat-input {
+  flex: 1;
+  resize: none;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  background: transparent;
+  max-height: 120px;
+  overflow-y: auto;
+  font-family: inherit;
+}
+
+.chat-input::placeholder {
+  color: #aaa;
+}
+
+.chat-input:disabled {
+  background: transparent;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.emoji-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+  transition: transform 0.15s ease-in-out;
+}
+
+.emoji-btn:hover {
+  transform: scale(1.1);
+}
+
+.cdk-overlay-pane {
+  z-index: 1000;
+}

@@ -1,0 +1,210 @@
+﻿// MEDIA QUERY MANAGER
+/*
+0 - 600px:      Phone
+600 - 900px:    Tablet portrait
+900 - 1200px:   Tablet landscape
+[1200 - 1800] is where our normal styles applys
+1800px + :      Big desktop
+$breakpoint arguement choices:
+- phone
+- tab-port
+- tab-land
+- big-desktop
+1em = 16px
+
+Fontos a sorrend, nagyobb pixelszámtól haladunk lefelé (1200-900-600),
+mert kis px szám esetén a legutolsó érvényesülne, mivel az ugyan úgy true.
+
+  @include respond(tab-land) {
+      // width < 1200?
+
+
+    }
+
+    @include respond(tab-port) {
+      // width < 900?
+
+    }
+
+    @include respond(phone) {
+      // width < 600?
+
+    }
+
+    @include respond(big-desktop) {
+     //width > 1800?
+    }
+*/
+@mixin respond($breakpoint) {
+  //600px
+  @if ($breakpoint==phone) {
+    @media only screen and (max-width: 37.5em) {
+      @content;
+    }
+  }
+
+  //900px
+  @if ($breakpoint==tab-port) {
+    @media only screen and (max-width: 56.25em) {
+      @content;
+    }
+  }
+
+  //1200px
+  @if ($breakpoint==tab-land) {
+    @media only screen and (max-width: 75em) {
+      @content;
+    }
+  }
+
+  //1800-
+  @if ($breakpoint==big-desktop) {
+    @media only screen and (min-width: 112.5em) {
+      @content;
+    }
+  }
+}
+
+@mixin ieSupport {
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    /* IE10+ CSS */
+    @content;
+  }
+}
+
+@mixin hoverOnInput {
+  transition: all 0.2s;
+  background-color: #e9e9e9;
+}
+
+//Generate Margin and padding-helpers
+$sizes: 12;
+
+@mixin margin-classes {
+  @for $i from 1 through $sizes {
+    $margin: $i * 0.25rem;
+
+    /* margin #{$margin} */
+    .m#{$i} {
+      margin: $margin;
+    }
+
+    .ml#{$i} {
+      margin-left: $margin;
+    }
+
+    .mr#{$i} {
+      margin-right: $margin;
+    }
+
+    .mt#{$i} {
+      margin-top: $margin;
+    }
+
+    .mb#{$i} {
+      margin-bottom: $margin;
+    }
+
+    .mx#{$i} {
+      margin-left: $margin;
+      margin-right: $margin;
+    }
+
+    .my#{$i} {
+      margin-top: $margin;
+      margin-bottom: $margin;
+    }
+  }
+}
+
+@include margin-classes;
+
+@mixin padding-classes {
+  @for $i from 1 through $sizes {
+    $padding: $i * 0.25rem;
+
+    /* padding #{$padding} */
+    .p#{$i} {
+      padding: $padding;
+    }
+
+    .pl#{$i} {
+      padding-left: $padding;
+    }
+
+    .pr#{$i} {
+      padding-right: $padding;
+    }
+
+    .pt#{$i} {
+      padding-top: $padding;
+    }
+
+    .pb#{$i} {
+      padding-bottom: $padding;
+    }
+
+    .px#{$i} {
+      padding-left: $padding;
+      padding-right: $padding;
+    }
+
+    .py#{$i} {
+      padding-top: $padding;
+      padding-bottom: $padding;
+    }
+  }
+}
+
+@include padding-classes;
+
+//Generate width-helpers
+
+@mixin width-classes {
+  @for $i from 1 through 100 {
+    $width: $i * 1%;
+
+    /* width #{$width} */
+    .w-#{$i} {
+      width: #{$width};
+    }
+  }
+}
+
+@include width-classes;
+
+@mixin clearfix {
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+@mixin absCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+//Buttons
+@mixin button-font {
+  font-size: 1.6rem;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+  color: $signal-white;
+  box-shadow: $signal-shadow;
+  transition: all 0.2s;
+}
+
+$icons: ();
+
+@each $name, $color in $icons {
+  .#{$name} {
+    background-color: $color;
+  }
+}

@@ -1,0 +1,18 @@
+﻿@switch (mode()) {
+  @default {
+    <echo-knowledge-toggle-button
+      [botId]="botId()"
+      [side]="side()"
+      [top]="top()"
+      [right]="right()"
+      [width]="width()"
+      [height]="height()"
+      [close]="close()"
+      [primary]="primary()">
+    </echo-knowledge-toggle-button>
+  }
+  @case ('inline') {
+    <echo-knowledge-chat [inline]="true"></echo-knowledge-chat>
+  }
+
+}

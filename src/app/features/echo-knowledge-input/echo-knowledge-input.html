@@ -1,0 +1,21 @@
+﻿<div class="chat-input-wrapper">
+  <textarea
+    name="chatInput"
+    [(ngModel)]="value"
+    [ngModelOptions]="{ standalone: true }"
+    (input)="onInput($event)"
+    (keydown)="onKeydown($event)"
+    placeholder="Type a message…"
+    rows="1"
+    class="chat-input"
+  ></textarea>
+  <button
+    #emojiBtn
+    type="button"
+    class="emoji-btn"
+    (click)="toggleEmojiPicker()"
+    aria-label="Open emoji picker"
+  >
+    😊
+  </button>
+</div>

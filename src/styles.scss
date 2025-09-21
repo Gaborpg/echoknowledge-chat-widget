@@ -1,1 +1,150 @@
-/* You can add global styles to this file, and also import other style files */
+// ================================
+// MATERIAL THEME (still global)
+// ================================
+@use '@angular/material' as mat;
+@use 'mixings';
+@use 'components';
+@use 'variables' as *;
+
+html {
+  @include mat.theme((
+    color: (
+      theme-type: light,
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+// ================================
+// WIDGET-SCOPED STYLES
+// ================================
+
+.echo-chat-scope {
+  height: 100%;
+  box-sizing: border-box;
+  // reset only inside widget
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+    padding: 0;
+    margin: 0;
+    list-style-position: inside;
+  }
+
+  // ----------------
+  // TABLES
+  // ----------------
+  table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f3f4f6;
+    font-weight: 600;
+    white-space: nowrap; // ✅ Fix wrapping issue
+    word-break: normal;
+  }
+
+  // ----------------
+  // LISTS
+  // ----------------
+  ul,
+  ol {
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+  }
+
+  li {
+    margin-bottom: 0.3rem;
+    padding-left: 0.25rem;
+  }
+
+  li::marker {
+    color: var(--echo-primary-color, #4f46e5); // echo primary with fallback
+  }
+
+  // ----------------
+  // TABLE FEEDBACK BAR
+  // ----------------
+  .table-response-wrapper {
+    position: relative;
+
+    .table-feedback-bar {
+      position: absolute;
+      bottom: -0.5rem;
+      right: 0.5rem;
+      opacity: 0;
+      display: flex;
+      pointer-events: none;
+      transition: opacity 0.2s ease-in-out;
+      border: 1px solid;
+      border-radius: 10px;
+      background-color: white;
+      justify-content: center;
+      width: 40px;
+    }
+
+    &:hover .table-feedback-bar {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .icon-btn {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  // ----------------
+  // SCROLLBAR (scoped only!)
+  // ----------------
+  ::-webkit-scrollbar {
+    width: 3px;
+    height: 5px;
+    background-color: transparent;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #999;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #333;
+  }
+}
+
+// ================================
+// DIALOG / OVERLAY EXTENSIONS
+// ================================
+
+::ng-deep .fullscreen-dialog .mat-dialog-container {
+  border-radius: 0 !important;
+}
+
+.chat-overlay-panel.echo-chat-scope {
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}

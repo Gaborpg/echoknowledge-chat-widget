@@ -1,0 +1,80 @@
+﻿@use 'sass:color';
+.echo-chat-scope {
+  // BRAND COLORS via CSS vars
+  --echo-primary-color: #2563eb;
+  --echo-primary-hover: #1d4ed8;
+  --primary-active: #1e40af;
+  --text-color: #333;
+  --divider-color: #ddd;
+  --hover-bg-light: #f7f8fb;
+
+  // FONT SCALE
+  --chat-font-size: 14px;
+
+  // etc. — all CSS vars live *inside the scope*
+}
+
+// =====================
+// BRAND COLORS via CSS vars
+// =====================
+$primary-color: var(--echo-primary-color);
+$primary-hover: var(--echo-primary-hover);
+$primary-active: var(--echo-primary-hover);
+$btn-text-color: #ffffff;
+
+// =====================
+// NEUTRALS via CSS vars
+// =====================
+$white: #ffffff;
+$black: #000000;
+
+$light-text: var(--text-color);
+$dark-text: var(--text-color);
+$input-border: #ccc;
+$divider-color: var(--divider-color);
+$hover-bg-light: var(--hover-bg-light);
+$google-btn-bg: $white;
+$google-btn-border: var(--input-border);
+
+// =====================
+// FONT SCALE (relative to .chat-container)
+// =====================
+// Control the base size with --chat-font-size (default 14px).
+// All tokens below use em so they scale with the container font-size.
+$font-xs: 0.875em;   // ~12px at 14px base
+$font-sm: 1.0em;     // ~14px
+$font-md: 1.1em;     // ~15.4px
+$font-lg: 1.2em;     // ~16.8px
+$font-xl: 1.4em;     // ~19.6px
+$font-xxl: 1.7em;    // ~23.8px
+
+// =====================
+// FONT WEIGHTS
+// =====================
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 600;
+
+// =====================
+// BUTTONS
+// =====================
+$btn-padding: 0.5em;
+$btn-font-size: $font-sm;
+$btn-font-weight: $font-weight-regular;
+$btn-radius: 0.8em;
+
+// =====================
+// BORDER RADIUS
+// =====================
+$rounded-sm: 0.4em;
+$rounded: 0.8em;
+$rounded-lg: 1.6em;
+
+// =====================
+// SPACING (em = scales with container font-size)
+// =====================
+$spacing-xs: 0.4em;
+$spacing-sm: 0.8em;
+$spacing-md: 1.2em;
+$spacing-lg: 1.8em;
+$spacing-xl: 3em;

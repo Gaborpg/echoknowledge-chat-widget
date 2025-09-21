@@ -1,0 +1,144 @@
+﻿@use 'variables' as *;
+
+/* Reusable button base instead of @extend */
+@mixin base-btn() {
+  padding: $btn-padding;
+  font-weight: $btn-font-weight;
+  font-size: $btn-font-size;
+  border-radius: $btn-radius;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+/* Scope all styles to the chat so they don't affect the host app */
+:where(.echo-chat-scope, echo-knowledge-chat, .chat-overlay-panel) {
+  // ================================
+  // FORM CONTROLS
+  // ================================
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  input[type='email'],
+  input[type='password'] {
+    padding: 1.2rem 1.6rem;
+    border: 0.1rem solid $input-border;
+    border-radius: $btn-radius;
+    font-size: $btn-font-size;
+    width: 100%;
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  input:focus {
+    border-color: $primary-color;
+    /* use the rgb triplet var so themes work everywhere */
+    box-shadow: 0 0 0 0.2rem rgba(var(--echo-primary-color-rgb), 0.2);
+  }
+
+  label {
+    font-size: $btn-font-size;
+    color: $dark-text;
+  }
+
+  // ================================
+  // BUTTONS
+  // ================================
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-sm;
+    padding: $btn-padding;
+    font-weight: $btn-font-weight;
+    font-size: $btn-font-size;
+    border: 0.1rem solid $input-border;
+    border-radius: $btn-radius;
+    background-color: $white;
+    color: $light-text;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+      background-color: $hover-bg-light;
+      border-color: $input-border;
+    }
+  }
+
+  .login-btn {
+    @include base-btn();
+    background-color: $primary-color;
+    color: $btn-text-color;
+
+    &:hover {
+      background-color: $primary-hover;
+    }
+  }
+
+  .select-btn {
+    @include base-btn();
+    background-color: $primary-color;
+    color: $btn-text-color;
+
+    &:hover {
+      background-color: $primary-hover;
+    }
+
+    &:disabled {
+      background-color: $primary-color;
+      color: $btn-text-color;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  // ================================
+  // DIVIDER
+  // ================================
+
+  .divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: $spacing-md 0;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 0.1rem;
+      background: $divider-color;
+    }
+
+    span {
+      padding: 0 $spacing-sm;
+      font-size: $font-sm;
+      color: $light-text;
+    }
+  }
+
+  // ================================
+  // BOTTOM TEXT
+  // ================================
+
+  .bottom-text {
+    text-align: center;
+    font-size: $font-md;
+    color: $light-text;
+
+    a {
+      color: $primary-color;
+      font-weight: $font-weight-medium;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

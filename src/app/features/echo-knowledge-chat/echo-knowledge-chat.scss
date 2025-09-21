@@ -1,0 +1,229 @@
+﻿@use 'sass:color';
+@use 'variables' as *;
+
+/* ────────────────────────────────────────────
+   SCOPE: apply ONLY when an ancestor has .echo-chat-scope
+   In Angular component styles this ensures strict scoping.
+   If your host element has the class directly, you can use
+   :host(.echo-chat-scope) instead.
+   ──────────────────────────────────────────── */
+:host-context(.echo-chat-scope) {
+
+  // ---------- LAYOUT SHELL ----------
+  :host { display: block; height: 100%; width: 100%; }
+
+  .chat-container {
+    /* Base, configurable size (3rd parties can override this var) */
+    --chat-font-size: 14px;
+    font-size: var(--chat-font-size);
+
+    display: grid;
+    grid-template-rows: 1fr auto auto; // messages, suggestions, input
+    height: 100%;
+    background: #f7f8fb;
+    overflow: hidden;
+
+    /* Enable container queries based on the chat’s own width */
+    container-type: inline-size;
+  }
+
+  /* Optional: auto-tune font for narrow popup widths */
+  @container (max-width: 420px) {
+    .chat-container { --chat-font-size: 13px; }
+  }
+  @container (max-width: 340px) {
+    .chat-container { --chat-font-size: 12px; }
+  }
+
+  // ---------- MESSAGES LIST ----------
+  .messages {
+    overflow-y: auto;
+    padding: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    scroll-behavior: smooth;
+
+    &::-webkit-scrollbar { width: 0.5em; }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,.12);
+      border-radius: 9999px;
+    }
+  }
+
+  // ---------- MESSAGE CARD ----------
+  /* Keep the row full width */
+  .message-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    /* side alignment for header/footer text */
+    &.user   .message-header, &.user   .message-footer { text-align: right; align-self: flex-end; }
+    &.bot    .message-header, &.bot    .message-footer,
+    &.admin  .message-header, &.admin  .message-footer { text-align: left;  align-self: flex-start; }
+  }
+
+  /* The bubble */
+  .message-container .message {
+    /* bubble width & wrapping */
+    max-width: 100%;
+    display: block;              /* shrink-to-content */
+    padding: $spacing-md $spacing-lg;
+    border-radius: 1.1em;
+    border: 1px solid color.change($black, $alpha: .06);
+    background: $white;
+    color: $dark-text;
+    line-height: 1.55;
+    font-size: $font-md;
+    box-shadow: 0 0.25em 0.9em rgba(17,24,39,.06);
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+
+    /* keep media inside the bubble */
+    img, video, canvas, iframe { max-width: 100%; height: auto; }
+    pre, code { max-width: 100%; overflow: auto; }
+
+    /* tables: don’t overflow; allow horizontal scroll if needed */
+    table {
+      width: 100%;
+      display: block;          /* so overflow works */
+      overflow-x: auto;
+      border-collapse: collapse;
+    }
+    th, td { white-space: nowrap; } /* improves horizontal scroll for very wide cells */
+  }
+
+  /* Left / Right positioning of the bubble via margins */
+  .message-container.user   .message { margin-left: auto;  border-top-right-radius: 6px; }
+  .message-container.bot    .message,
+  .message-container.admin  .message { margin-right: auto; border-top-left-radius: 6px; }
+
+  /* Role variants */
+  .message-container.user .message {
+    background: $primary-color;
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 0.4em 1em rgba(var(--echo-primary-color-rgb) / 0.25);
+  }
+  .message-container.admin .message {
+    background: #fff7df;
+    color: #784f00;
+    border-color: #ffe19a;
+    box-shadow: none;
+  }
+
+  /* Typing bubble stays on the left */
+  .message.typing { align-self: flex-start; }
+
+  /* Mobile: allow wider bubbles */
+  @media (max-width: 520px) {
+    .message-container .message { max-width: 90%; }
+  }
+
+  // ---------- TYPING STATE ----------
+  .message.typing {
+    align-self: flex-start;
+    background: transparent;
+    border: 0;
+    padding: 0 $spacing-md;
+    color: #888;
+    font-style: italic;
+    font-size: $font-sm;
+  }
+
+  // ---------- RICH CONTENT ----------
+  .message-container .message {
+    p { margin: 0 0 $spacing-sm 0; }
+    ul, ol { margin: 0 0 $spacing-sm 1.2em; }
+    li { margin: .2em 0; }
+
+    a {
+      color: color-mix(in srgb, var(--echo-primary-color) 60%, #222);
+      text-decoration: none; border-bottom: 1px solid currentColor;
+      &:hover { opacity: .85; }
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #f1f4f9;
+      padding: .15em .35em;
+      border-radius: 0.4em;
+      border: 1px solid #e6eaf2;
+      font-size: 0.95em;
+    }
+
+    pre {
+      background: #0b1020; color: #edf2ff;
+      padding: $spacing-md; border-radius: 0.9em; overflow: auto;
+      border: 1px solid rgba(255,255,255,.08);
+      code { background: transparent; border: 0; color: inherit; }
+    }
+
+    blockquote {
+      margin: 0 0 $spacing-sm 0; padding: $spacing-sm $spacing-md;
+      border-left: 3px solid $primary-color; background: #f4f7ff; border-radius: 0.5em;
+    }
+  }
+
+  // ---------- SUGGESTIONS ----------
+  .input-suggestions {
+    padding: $spacing-sm $spacing-lg $spacing-xs;
+    border-top: 1px solid $divider-color;
+    background: #fbfcfe;
+  }
+
+  .suggestions {
+    display: flex;
+    gap: $spacing-sm;
+    overflow-x: auto;
+    padding-bottom: $spacing-sm;
+
+    &::-webkit-scrollbar { height: 0.5em; }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,.12);
+      border-radius: 9999px;
+    }
+  }
+
+  .suggestion {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: .55em .85em;
+    font-weight: $btn-font-weight;
+    font-size: $btn-font-size;
+    border: 1px solid $google-btn-border;
+    border-radius: 9999px;
+    background-color: $white;
+    color: $light-text;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+
+    &:hover { border-color: color.change($black, $alpha: .12); }
+    &:active { transform: translateY(0); }
+  }
+
+  // ---------- INPUT AREA ----------
+  .input-area {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-sm;
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $divider-color;
+    background: #fff;
+
+    echo-knowledge-input {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  // ---------- EXTRA SMALL SAFETY ----------
+  @media (max-width: 520px) {
+    .messages { padding: $spacing-md; }
+    .message-container .message { font-size: $font-sm; }
+  }
+}

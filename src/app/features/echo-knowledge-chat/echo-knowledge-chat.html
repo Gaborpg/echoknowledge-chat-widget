@@ -1,0 +1,60 @@
+﻿<section class="chat-container">
+  <div #messagesRef class="messages">
+    @for (message of messages; track message) {
+      <div class="message-container"
+           [class.bot]="message.role === 'bot'"
+           [class.user]="message.role === 'user'"
+           [class.admin]="message.role === 'admin'">
+        <div class="message-header">
+          <div class="message-avatar"></div>
+          <div class="message-title"></div>
+        </div>
+        <div
+          class="message"
+        >
+          @if (message.role === 'bot') {
+            <div [innerHTML]="message.text"></div>
+          } @else {
+            <div>{{ message.text }}</div>
+          }
+        </div>
+        <div class="message-footer">
+          <div class="message-timestamp">
+            @if (message.role === 'bot') {
+              <span class="bot-timestamp">{{ message.timestamp | date }}</span>
+            } @else {
+              <span class="user-timestamp">{{ message.timestamp | date}}</span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (typing) {
+      <div class="message typing">Typing…</div>
+    }
+  </div>
+  @if (messages.length === 0) {
+    <div class="input-suggestions">
+      @if (suggestions.length > 0) {
+        <div class="suggestions">
+          @for (suggestion of suggestions; track suggestion) {
+            <button
+              class="suggestion"
+              (click)="onSuggestionClick(suggestion)"
+            >
+              {{ suggestion }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+  <form class="input-area" (ngSubmit)="sendMessage()" novalidate>
+    <echo-knowledge-input
+      [(ngModel)]="userInput"
+      name="message"
+      (enterPressed)="sendMessage()"
+    />
+  </form>
+</section>

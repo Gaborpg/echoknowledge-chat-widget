@@ -1,0 +1,8 @@
+﻿<button
+  #fab
+  type="button"
+  class="chat-fab"
+  (click)="toggle()">
+  <span *ngIf="!opened()">💬</span>
+  <span *ngIf="opened()">✕</span>
+</button>
