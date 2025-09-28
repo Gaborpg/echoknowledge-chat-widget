@@ -1,6 +1,5 @@
 ﻿import {createApplication} from '@angular/platform-browser';
 import {provideHttpClient, withFetch} from '@angular/common/http';
-import {provideAnimations} from '@angular/platform-browser/animations';
 import {CSP_NONCE, importProvidersFrom, Injector} from '@angular/core';
 import {OverlayModule} from '@angular/cdk/overlay';
 import {MatDialogModule} from '@angular/material/dialog';
@@ -19,7 +18,6 @@ async function defineEchoChatElement() {
   const app = await createApplication({
     providers: [
       provideHttpClient(withFetch()),
-      provideAnimations(),
       importProvidersFrom(OverlayModule),
       importProvidersFrom(MatDialogModule),
       { provide: CSP_NONCE, useValue: readNonceFromLoader() }
