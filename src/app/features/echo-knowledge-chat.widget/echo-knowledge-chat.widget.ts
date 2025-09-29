@@ -1,13 +1,15 @@
 ﻿import {
-  afterNextRender, booleanAttribute, Component, effect, ElementRef,
-  inject, input, ViewEncapsulation, computed, OnInit, untracked, Injector, signal, DestroyRef
+  Component, ViewEncapsulation, ElementRef, Injector, signal, computed,
+  effect, input, booleanAttribute, inject, OnInit, DestroyRef
 } from '@angular/core';
-import {ChatMode, ChatPopUp, ChatPopupOptions} from '../../core/services/chat-pop-up';
+
 import { EchoKnowledgeToggleButton } from '../echo-knowledge-toggle-button/echo-knowledge-toggle-button';
-import {EchoKnowledgeChat} from '../echo-knowledge-chat/echo-knowledge-chat';
-import {NavigationEnd, Router} from '@angular/router';
-import {filter} from 'rxjs';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import { EchoKnowledgeChat } from '../echo-knowledge-chat/echo-knowledge-chat';
+import { ChatMode, ChatPopUp, ChatPopupOptions } from '../../core/services/chat-pop-up';
+
+import { Router } from '@angular/router';
+import { fromEvent, of, filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'echo-knowledge-chat-widget',
@@ -15,13 +17,15 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   templateUrl: './echo-knowledge-chat.widget.html',
   styleUrl: './echo-knowledge-chat.widget.scss',
   encapsulation: ViewEncapsulation.None,
-  host: { class: 'echo-chat-host' } // optional: gives you a stable scope hook
+  host: { class: 'echo-chat-host' }
 })
 export class EchoKnowledgeChatWidget implements OnInit {
   private popup = inject(ChatPopUp);
   private readonly injector = inject(Injector);
-  private router = inject(Router);
-  private destroyRef = inject(DestroyRef);
+  private readonly destroyRef = inject(DestroyRef);
+
+  // Router is optional so the widget works on non-Angular hosts too
+  private readonly router = inject(Router, { optional: true });
 
   constructor(private host: ElementRef<HTMLElement>) {}
 
@@ -34,23 +38,68 @@ export class EchoKnowledgeChatWidget implements OnInit {
   height   = input<number | string>('90%');
   close    = input<'outside'|'fab-only'|'backdrop'>('outside');
   autoOpen = input<boolean, string>(false, { alias: 'auto-open', transform: booleanAttribute });
-  primary = input<string>("", { alias: 'primary' });
-  include = input<string>('');     // e.g. "/bot, /auth/**"
-  exclude = input<string>('');         // e.g. "/main, /checkout/**"
-  private currentPath = signal(this.router.url);
+  primary  = input<string>('', { alias: 'primary' });
+  include  = input<string>(''); // e.g. "/bot, /auth/**"
+  exclude  = input<string>(''); // e.g. "/main, /checkout/**"
+
+  // Track current host path (pathname + hash to support hash-based routers)
+  private readHostPath(): string {
+    const { pathname, hash } = window.location;
+    return pathname + (hash || '');
+  }
+
+  private currentPath = signal<string>(this.readHostPath());
 
   ngOnInit() {
-    this.router.events
-      .pipe(
-        filter(e => e instanceof NavigationEnd),
-        takeUntilDestroyed(this.destroyRef))
-      .subscribe((e: any) => this.currentPath.set(e.urlAfterRedirects || e.url));
+    if (this.router) {
+      // Angular host: follow Router url + events
+      this.currentPath.set(this.router.url);
+      this.router.events
+        .pipe(
+          filter((e: any) => !!(e && (e.urlAfterRedirects ?? e.url))),
+          takeUntilDestroyed(this.destroyRef)
+        )
+        .subscribe((e: any) => this.currentPath.set(e.urlAfterRedirects || e.url));
+    } else {
+      // Non-Angular host: robust URL tracking (popstate/hash + pushState/replaceState)
+      const LCHG = 'echo-locationchange';
 
-    const wantsOpen = computed(() => this.autoOpen() && this.mode() === 'popup');
+      const patchHistory = () => {
+        const { pushState, replaceState } = history as any;
+        if (!(history as any).__echoPatched) {
+          (history as any).pushState = function (...args: any[]) {
+            const ret = pushState.apply(this, args);
+            window.dispatchEvent(new Event(LCHG));
+            return ret;
+          };
+          (history as any).replaceState = function (...args: any[]) {
+            const ret = replaceState.apply(this, args);
+            window.dispatchEvent(new Event(LCHG));
+            return ret;
+          };
+          (history as any).__echoPatched = true;
+        }
+      };
 
-    // create effect *now* (inside injection context)
+      patchHistory();
+
+      const update = () => this.currentPath.set(this.readHostPath());
+
+      fromEvent(window, 'popstate').pipe(takeUntilDestroyed(this.destroyRef)).subscribe(update);
+      fromEvent(window, 'hashchange').pipe(takeUntilDestroyed(this.destroyRef)).subscribe(update);
+      fromEvent(window, LCHG).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(update);
+
+      // initial sync (microtask)
+      Promise.resolve().then(update);
+    }
+
+    // Only auto-open when popup mode and the widget is visible by rules
+    const wantsOpen = computed(() => this.autoOpen() && this.mode() === 'popup' && this.visible());
+
     effect(() => {
-      if (this.mode() === 'inline') this.paintInlineTheme(this.primary() ? { primary: this.primary() } : undefined);
+      if (this.mode() === 'inline') {
+        this.paintInlineTheme(this.primary() ? { primary: this.primary() } : undefined);
+      }
       if (wantsOpen()) {
         this.popup.open({
           mode: this.mode(),
@@ -60,18 +109,20 @@ export class EchoKnowledgeChatWidget implements OnInit {
           widthDesktop: this.width(),
           heightDesktop: this.height(),
           close: this.close(),
-          theme: this.primary() ? { primary: this.primary() } : undefined, // service paints the overlay pane
+          theme: this.primary() ? { primary: this.primary() } : undefined,
         });
+      } else {
+        // ensure it’s closed when rules say it's not visible / not auto-open
+        this.popup.close();
       }
     }, { injector: this.injector });
-
   }
 
+  // Visibility rules based on host path (works with or without Router)
   visible = computed(() => {
     const path = this.currentPath();
     const inc = this.toRegexList(this.include());
     const exc = this.toRegexList(this.exclude());
-
     const inInclude = inc.length === 0 || inc.some(r => r.test(path));
     const inExclude = exc.some(r => r.test(path));
     return inInclude && !inExclude;
@@ -96,9 +147,9 @@ export class EchoKnowledgeChatWidget implements OnInit {
   }
 
   // Optional JS API for hosts:
-  open()  { this.popup.open({ mode: this.mode(), top: this.top(), right: this.right(), close: this.close() }); }
-  closeW(){ this.popup.close(); }
-  toggle(){ this.popup.toggle({ mode: this.mode(), top: this.top(), right: this.right(), close: this.close() }); }
+  open()   { this.popup.open({ mode: this.mode(), top: this.top(), right: this.right(), close: this.close() }); }
+  closeW() { this.popup.close(); }
+  toggle() { this.popup.toggle({ mode: this.mode(), top: this.top(), right: this.right(), close: this.close() }); }
 
   private applyThemeToPane(theme: ChatPopupOptions['theme'] | undefined) {
     if (!theme?.primary) return;
@@ -108,15 +159,8 @@ export class EchoKnowledgeChatWidget implements OnInit {
 
   private paintInlineTheme(theme?: { primary: string }) {
     if (!theme?.primary) return;
-
-    // Wait until child DOM exists
-      const root = this.host.nativeElement.querySelector('.echo-chat-scope') as HTMLElement | null;
-      if (root) {
-        root.style.setProperty('--echo-primary-color', theme.primary);
-      } else {
-        // fallback: host
-        this.host.nativeElement.style.setProperty('--echo-primary-color', theme.primary);
-      }
+    const root = this.host.nativeElement.querySelector('.echo-chat-scope') as HTMLElement | null;
+    if (root) root.style.setProperty('--echo-primary-color', theme.primary);
+    else this.host.nativeElement.style.setProperty('--echo-primary-color', theme.primary);
   }
-
 }

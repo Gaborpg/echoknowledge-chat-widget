@@ -53,6 +53,30 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "embed": {
+              "browser": "src/app/features/echo-knowledge-chat.widget/main.ts",
+              "outputHashing": "none",
+              "polyfills": [ "zone.js"],
+              "assets": [
+                { "glob": "**/*", "input": "public", "output": "./" },
+                { "glob": "embed.js", "input": "src/app/features/echo-knowledge-chat.widget", "output": "./" }
+              ],
+              "styles": [
+                "src/styles.scss",
+                "node_modules/@ctrl/ngx-emoji-mart/picker.css"
+              ],
+              "stylePreprocessorOptions": {
+                "includePaths": [
+                  "./src/styles/mixings",
+                  "./src/styles/variables",
+                  "./src/styles/components"
+                ]
+              },
+              "fileReplacements": [
+                { "replace": "src/app/app.routes.ts", "with": "src/app/empty.routes.ts" },
+                { "replace": "src/app/app.config.ts", "with": "src/app/app.config.embed.ts" }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -65,7 +89,8 @@
             },
             "development": {
               "buildTarget": "EchoKnowledgeChatWidget:build:development"
-            }
+            },
+            "embed": { "buildTarget": "EchoKnowledgeChatWidget:build:embed" }
           },
           "defaultConfiguration": "development"
         },
